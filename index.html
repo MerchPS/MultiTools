@@ -275,7 +275,15 @@
         // Fungsi untuk mendapatkan data pengguna dari API route
         async function getUserData() {
             try {
-                const response = await fetch('/api/get-users');
+                const response = await fetch('/api/get-users', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify({ 
+                        secretKey: process.env.API_SECRET_KEY 
+                    })
+                });
                 
                 if (!response.ok) {
                     throw new Error('Gagal mengambil data');
@@ -298,7 +306,10 @@
                     headers: {
                         'Content-Type': 'application/json'
                     },
-                    body: JSON.stringify({ users })
+                    body: JSON.stringify({ 
+                        users,
+                        secretKey: process.env.API_SECRET_KEY 
+                    })
                 });
                 
                 if (!response.ok) {
