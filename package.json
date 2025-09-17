@@ -1,0 +1,10 @@
+{
+  "name": "secure-login-system",
+  "version": "1.0.0",
+  "description": "A secure login system with JSONBin integration",
+  "scripts": {
+    "dev": "vercel dev"
+  },
+  "dependencies": {},
+  "devDependencies": {}
+}
