@@ -1,17 +1,17 @@
 // api/get-users.js
+const validateRequest = require('./auth-middleware');
+
 module.exports = async (req, res) => {
-  if (req.method !== 'POST') { // Ubah dari GET ke POST
+  if (req.method !== 'GET') {
     return res.status(405).json({ error: 'Method not allowed' });
   }
 
-  try {
-    // Validasi token atau secret key dari request body
-    const { secretKey } = req.body;
-    
-    if (!secretKey || secretKey !== process.env.API_SECRET_KEY) {
-      return res.status(401).json({ error: 'Unauthorized access' });
-    }
+  // Validasi request
+  if (!validateRequest(req)) {
+    return res.status(401).json({ error: 'Unauthorized access' });
+  }
 
+  try {
     // Konfigurasi JSONBin dari environment variables
     const binId = process.env.JSONBIN_BIN_ID;
     const masterKey = process.env.JSONBIN_MASTER_KEY;
