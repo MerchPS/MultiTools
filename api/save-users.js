@@ -5,7 +5,12 @@ module.exports = async (req, res) => {
   }
 
   try {
-    const { users } = req.body;
+    // Validasi token atau secret key dari request body
+    const { users, secretKey } = req.body;
+    
+    if (!secretKey || secretKey !== process.env.API_SECRET_KEY) {
+      return res.status(401).json({ error: 'Unauthorized access' });
+    }
     
     // Validasi data
     if (!users || !Array.isArray(users)) {
