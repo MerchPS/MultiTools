@@ -3,223 +3,96 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <script src="https://cdn.tailwindcss.com"></script>
     <title>Secure Login System</title>
     <style>
-        * {
-            margin: 0;
-            padding: 0;
-            box-sizing: border-box;
-            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-        }
-        
-        body {
-            background: linear-gradient(135deg, #6a11cb 0%, #2575fc 100%);
-            min-height: 100vh;
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            padding: 20px;
-        }
-        
-        .container {
-            width: 100%;
-            max-width: 450px;
-            background: white;
-            border-radius: 12px;
-            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.2);
-            overflow: hidden;
-        }
-        
-        .header {
-            background: #4a6cf7;
-            color: white;
-            padding: 25px;
-            text-align: center;
-        }
-        
-        .header h1 {
-            font-size: 28px;
-            margin-bottom: 5px;
-        }
-        
-        .header p {
-            opacity: 0.9;
-        }
-        
-        .form-container {
-            padding: 30px;
-        }
-        
-        .tab-container {
-            display: flex;
-            margin-bottom: 25px;
-            border-bottom: 1px solid #eee;
-        }
-        
-        .tab {
-            flex: 1;
-            text-align: center;
-            padding: 15px;
-            cursor: pointer;
-            font-weight: 600;
-            color: #888;
-            transition: all 0.3s;
-        }
-        
-        .tab.active {
-            color: #4a6cf7;
-            border-bottom: 3px solid #4a6cf7;
-        }
-        
-        .form {
-            display: none;
-        }
-        
-        .form.active {
-            display: block;
-        }
-        
-        .input-group {
-            margin-bottom: 20px;
-        }
-        
-        .input-group label {
-            display: block;
-            margin-bottom: 8px;
-            font-weight: 500;
-            color: #333;
-        }
-        
-        .input-group input {
-            width: 100%;
-            padding: 14px;
-            border: 1px solid #ddd;
-            border-radius: 6px;
-            font-size: 16px;
-            transition: border 0.3s;
-        }
-        
-        .input-group input:focus {
-            border-color: #4a6cf7;
-            outline: none;
-        }
-        
-        .btn {
-            width: 100%;
-            padding: 14px;
-            background: #4a6cf7;
-            color: white;
-            border: none;
-            border-radius: 6px;
-            font-size: 16px;
-            font-weight: 600;
-            cursor: pointer;
-            transition: background 0.3s;
-        }
-        
-        .btn:hover {
-            background: #3a5cd8;
-        }
-        
-        .message {
-            margin-top: 20px;
-            padding: 12px;
-            border-radius: 6px;
-            text-align: center;
-            display: none;
-        }
-        
-        .message.success {
-            background: #e9f7ef;
-            color: #28a745;
-            border: 1px solid #b7e4c7;
-        }
-        
-        .message.error {
-            background: #fde8e8;
-            color: #dc3545;
-            border: 1px solid #f5c6cb;
-        }
-        
-        .footer {
-            text-align: center;
-            padding: 20px;
-            color: #666;
-            font-size: 14px;
-            border-top: 1px solid #eee;
-        }
-        
-        @media (max-width: 480px) {
-            .container {
-                max-width: 100%;
-            }
-            
-            .form-container {
-                padding: 20px;
-            }
-        }
-    </style>
+@keyframes fade-in {
+  from { opacity: 0; transform: translateY(10px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+.animate-fade-in {
+  animation: fade-in 0.5s ease-in-out;
+}
+</style>
 </head>
-<body>
-    <div class="container">
-        <div class="header">
-            <h1>Secure Login</h1>
-            <p>Masuk atau daftar untuk mengakses sistem</p>
-        </div>
+<body class="min-h-screen flex items-center justify-center bg-gradient-to-br from-gray-100 via-white to-gray-200 p-4">
+    <div class="w-full max-w-md bg-white rounded-2xl shadow-xl overflow-hidden animate-fade-in">
         
-        <div class="form-container">
-            <div class="tab-container">
-                <div class="tab active" id="loginTab">Login</div>
-                <div class="tab" id="registerTab">Register</div>
+        <!-- Header -->
+        <div class="bg-gradient-to-r from-blue-600 to-indigo-500 text-white p-6 text-center">
+            <h1 class="text-2xl font-bold">Secure Login</h1>
+            <p class="opacity-80">Masuk atau daftar untuk mengakses sistem</p>
+        </div>
+
+        <!-- Form Container -->
+        <div class="p-6">
+            <!-- Tabs -->
+            <div class="flex border-b border-gray-200 mb-6">
+                <button id="loginTab" 
+                        class="flex-1 py-2 text-center font-semibold text-gray-500 border-b-2 border-transparent hover:text-blue-600 hover:border-blue-600 transition-colors">
+                    Login
+                </button>
+                <button id="registerTab" 
+                        class="flex-1 py-2 text-center font-semibold text-gray-500 border-b-2 border-transparent hover:text-blue-600 hover:border-blue-600 transition-colors">
+                    Register
+                </button>
             </div>
-            
-            <form id="loginForm" class="form active">
-                <div class="input-group">
-                    <label for="loginUsername">Username</label>
-                    <input type="text" id="loginUsername" required>
+
+            <!-- Login Form -->
+            <form id="loginForm" class="space-y-4">
+                <div>
+                    <label for="loginUsername" class="block text-sm font-medium text-gray-700">Username</label>
+                    <input type="text" id="loginUsername" required 
+                           class="mt-1 w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 outline-none transition" />
                 </div>
-                
-                <div class="input-group">
-                    <label for="loginPassword">Password</label>
-                    <input type="password" id="loginPassword" required>
+                <div>
+                    <label for="loginPassword" class="block text-sm font-medium text-gray-700">Password</label>
+                    <input type="password" id="loginPassword" required 
+                           class="mt-1 w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 outline-none transition" />
                 </div>
-                
-                <button type="submit" class="btn">Masuk</button>
-                
-                <div id="loginMessage" class="message"></div>
+                <button type="submit" 
+                        class="w-full py-2.5 bg-blue-600 text-white font-semibold rounded-lg hover:bg-blue-700 transition-colors">
+                    Masuk
+                </button>
+                <div id="loginMessage" class="hidden text-center text-sm rounded-lg py-2"></div>
             </form>
-            
-            <form id="registerForm" class="form">
-                <div class="input-group">
-                    <label for="registerUsername">Username</label>
-                    <input type="text" id="registerUsername" required>
+
+            <!-- Register Form -->
+            <form id="registerForm" class="hidden space-y-4">
+                <div>
+                    <label for="registerUsername" class="block text-sm font-medium text-gray-700">Username</label>
+                    <input type="text" id="registerUsername" required 
+                           class="mt-1 w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 outline-none transition" />
                 </div>
-                
-                <div class="input-group">
-                    <label for="registerEmail">Email</label>
-                    <input type="email" id="registerEmail" required>
+                <div>
+                    <label for="registerEmail" class="block text-sm font-medium text-gray-700">Email</label>
+                    <input type="email" id="registerEmail" required 
+                           class="mt-1 w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 outline-none transition" />
                 </div>
-                
-                <div class="input-group">
-                    <label for="registerPassword">Password</label>
-                    <input type="password" id="registerPassword" required>
+                <div>
+                    <label for="registerPassword" class="block text-sm font-medium text-gray-700">Password</label>
+                    <input type="password" id="registerPassword" required 
+                           class="mt-1 w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 outline-none transition" />
                 </div>
-                
-                <div class="input-group">
-                    <label for="registerConfirmPassword">Konfirmasi Password</label>
-                    <input type="password" id="registerConfirmPassword" required>
+                <div>
+                    <label for="registerConfirmPassword" class="block text-sm font-medium text-gray-700">Konfirmasi Password</label>
+                    <input type="password" id="registerConfirmPassword" required 
+                           class="mt-1 w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 outline-none transition" />
                 </div>
-                
-                <button type="submit" class="btn">Daftar</button>
-                
-                <div id="registerMessage" class="message"></div>
+                <button type="submit" 
+                        class="w-full py-2.5 bg-indigo-600 text-white font-semibold rounded-lg hover:bg-indigo-700 transition-colors">
+                    Daftar
+                </button>
+                <div id="registerMessage" class="hidden text-center text-sm rounded-lg py-2"></div>
             </form>
         </div>
-        
-        <div class="footer">
-            <p>&copy; 2023 Secure System. All rights reserved.</p>
+
+        <!-- Footer -->
+        <div class="text-center text-gray-500 text-sm py-4 border-t border-gray-200">
+            © 2023 Secure System. All rights reserved.
         </div>
     </div>
+</body>
 
     <script>
     // Elemen DOM
