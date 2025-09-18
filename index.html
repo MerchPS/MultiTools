@@ -230,8 +230,8 @@
     const loginMessage = document.getElementById('loginMessage');
     const registerMessage = document.getElementById('registerMessage');
     
-    // API Auth Token (disimpan di environment variable)
-    const API_AUTH_TOKEN = 'vercel-auth-token-12345'; // Ini akan diganti dengan env variable
+    // API Auth Token
+    const API_AUTH_TOKEN = 'secure-auth-token-987654321-vercel-app';
     
     // Fungsi untuk mengubah tab
     function switchTab(tab) {
@@ -264,42 +264,15 @@
         }, 5000);
     }
     
-    // Fungsi untuk hash password sederhana
+    // Fungsi untuk hash password
     function hashPassword(password) {
         let hash = 0;
         for (let i = 0; i < password.length; i++) {
             const char = password.charCodeAt(i);
             hash = (hash << 5) - hash + char;
-            hash |= 0; // Convert to 32bit integer
+            hash |= 0;
         }
         return hash.toString();
-    }
-    
-    // Fungsi untuk mendapatkan data pengguna dari API route
-    async function getUserData() {
-        try {
-            const response = await fetch('/api/get-users', {
-                method: 'POST',
-                headers: {
-                    'Content-Type': 'application/json'
-                },
-                body: JSON.stringify({ 
-                    authToken: API_AUTH_TOKEN 
-                })
-            });
-            
-            if (!response.ok) {
-                const errorData = await response.json();
-                throw new Error(errorData.error || 'Gagal mengambil data');
-            }
-            
-            const data = await response.json();
-            return data.users || [];
-        } catch (error) {
-            console.error('Error:', error);
-            showMessage(loginMessage, 'Terjadi kesalahan sistem', 'error');
-            return [];
-        }
     }
     
     // Fungsi untuk validasi login
@@ -329,30 +302,27 @@
         }
     }
     
-    // Fungsi untuk menyimpan data pengguna melalui API route
-    async function saveUserData(users) {
+    // Fungsi untuk registrasi user baru
+    async function registerUser(userData) {
         try {
-            const response = await fetch('/api/save-users', {
+            const response = await fetch('/api/register', {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json'
                 },
-                body: JSON.stringify({ 
-                    users,
-                    authToken: API_AUTH_TOKEN 
-                })
+                body: JSON.stringify(userData)
             });
             
             if (!response.ok) {
                 const errorData = await response.json();
-                throw new Error(errorData.error || 'Gagal menyimpan data');
+                throw new Error(errorData.error || 'Registrasi gagal');
             }
             
-            return true;
+            const data = await response.json();
+            return data;
         } catch (error) {
-            console.error('Error:', error);
-            showMessage(registerMessage, 'Terjadi kesalahan sistem', 'error');
-            return false;
+            console.error('Registration error:', error);
+            throw error;
         }
     }
     
@@ -446,33 +416,16 @@
         submitBtn.disabled = true;
         
         try {
-            // Ambil data pengguna yang sudah ada
-            const users = await getUserData();
-            
-            // Cek apakah username sudah digunakan
-            if (users.some(user => user.username === username)) {
-                showMessage(registerMessage, 'Username sudah digunakan', 'error');
-                return;
-            }
-            
-            // Cek apakah email sudah digunakan
-            if (users.some(user => user.email === email)) {
-                showMessage(registerMessage, 'Email sudah digunakan', 'error');
-                return;
-            }
-            
-            // Tambahkan pengguna baru
-            users.push({
+            // Registrasi user baru melalui API khusus
+            const result = await registerUser({
                 username,
                 email,
-                password: hashPassword(password),
-                createdAt: new Date().toISOString()
+                password,
+                confirmPassword,
+                captchaToken: 'demo-token' // Ganti dengan token CAPTCHA nyata jika digunakan
             });
             
-            // Simpan data pengguna
-            const success = await saveUserData(users);
-            
-            if (success) {
+            if (result.success) {
                 showMessage(registerMessage, 'Pendaftaran berhasil! Silakan login.', 'success');
                 
                 // Kosongkan form
@@ -485,7 +438,7 @@
             }
         } catch (error) {
             console.error('Registration error:', error);
-            showMessage(registerMessage, 'Terjadi kesalahan saat pendaftaran', 'error');
+            showMessage(registerMessage, error.message, 'error');
         } finally {
             // Kembalikan state tombol
             submitBtn.textContent = originalText;
@@ -513,15 +466,6 @@
             return false;
         }
     });
-    
-    // Blokir pembukaan developer tools
-    setInterval(() => {
-        if (window.outerHeight - window.innerHeight > 100 || 
-            window.outerWidth - window.innerWidth > 100) {
-            // Developer tools mungkin terbuka
-            window.location.reload();
-        }
-    }, 1000);
 </script>
 </body>
 </html>
