@@ -2,8 +2,8 @@
 module.exports = async (req, res) => {
   // Set CORS headers
   res.setHeader('Access-Control-Allow-Origin', 'https://multitools-page.vercel.app');
-  res.setHeader('Access-Control-Allow-Methods', 'GET, POST, OPTIONS');
-  res.setHeader('Access-Control-Allow-Headers', 'Content-Type');
+  res.setHeader('Access-Control-Allow-Methods', 'POST, OPTIONS');
+  res.setHeader('Access-Control-Allow-Headers', 'Content-Type, Authorization');
   
   // Handle preflight request
   if (req.method === 'OPTIONS') {
@@ -23,7 +23,16 @@ module.exports = async (req, res) => {
     
     req.on('end', async () => {
       try {
-        const { users } = JSON.parse(body);
+        const { users, authToken, action = 'add' } = JSON.parse(body);
+        
+        // Validasi auth token
+        if (!authToken || authToken !== process.env.API_AUTH_TOKEN) {
+          console.error('Invalid auth token');
+          return res.status(401).json({ 
+            error: 'Unauthorized',
+            message: 'Token autentikasi tidak valid' 
+          });
+        }
         
         // Validasi data
         if (!users || !Array.isArray(users)) {
@@ -40,31 +49,73 @@ module.exports = async (req, res) => {
           return res.status(500).json({ error: 'Server configuration error' });
         }
 
+        // Ambil data yang sudah ada dari JSONBin
+        const existingResponse = await fetch(`https://api.jsonbin.io/v3/b/${binId}/latest`, {
+          headers: {
+            'X-Master-Key': masterKey,
+            'X-Access-Key': accessKey,
+            'Content-Type': 'application/json'
+          }
+        });
+        
+        if (!existingResponse.ok) {
+          console.error('JSONBin API error:', existingResponse.status, existingResponse.statusText);
+          return res.status(500).json({ 
+            error: 'Gagal mengambil data yang sudah ada'
+          });
+        }
+        
+        const existingData = await existingResponse.json();
+        const currentData = existingData.record || { users: [], sessions: {} };
+        
+        // Proses data berdasarkan action
+        if (action === 'add') {
+          // Tambahkan user baru ke data yang sudah ada
+          currentData.users = [...currentData.users, ...users];
+        } else if (action === 'replace') {
+          // Ganti seluruh data users
+          currentData.users = users;
+        } else if (action === 'update') {
+          // Update user yang sudah ada
+          users.forEach(newUser => {
+            const index = currentData.users.findIndex(u => u.username === newUser.username);
+            if (index !== -1) {
+              currentData.users[index] = { ...currentData.users[index], ...newUser };
+            } else {
+              currentData.users.push(newUser);
+            }
+          });
+        }
+        
         // Simpan ke JSONBin
-        const response = await fetch(`https://api.jsonbin.io/v3/b/${binId}`, {
+        const saveResponse = await fetch(`https://api.jsonbin.io/v3/b/${binId}`, {
           method: 'PUT',
           headers: {
             'Content-Type': 'application/json',
             'X-Master-Key': masterKey,
             'X-Access-Key': accessKey
           },
-          body: JSON.stringify({ users })
+          body: JSON.stringify(currentData)
         });
 
-        if (!response.ok) {
-          const errorText = await response.text();
-          console.error('JSONBin API error:', response.status, errorText);
-          throw new Error(`Gagal menyimpan data: ${response.status} ${errorText}`);
+        if (!saveResponse.ok) {
+          const errorText = await saveResponse.text();
+          console.error('JSONBin API error:', saveResponse.status, errorText);
+          return res.status(500).json({ 
+            error: 'Gagal menyimpan data',
+            message: errorText
+          });
         }
 
         console.log('Data saved successfully');
         res.status(200).json({ 
           success: true, 
-          message: 'Data berhasil disimpan' 
+          message: 'Data berhasil disimpan',
+          count: currentData.users.length
         });
       } catch (parseError) {
         console.error('Error parsing request:', parseError);
-        res.status(400).json({ error: 'Invalid JSON format' });
+        res.status(400).json({ error: 'Format data tidak valid' });
       }
     });
   } catch (error) {
