@@ -11,7 +11,7 @@ module.exports = async (req, res) => {
   }
 
   if (req.method !== 'POST') {
-    return res.status(405).json({ error: 'Method not allowed' });
+    return res.status(405).json({ error: 'Method not allowed Dek Dek Mau Maling Apa Gimana Dek?' });
   }
 
   try {
