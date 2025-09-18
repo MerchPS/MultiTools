@@ -230,6 +230,9 @@
     const loginMessage = document.getElementById('loginMessage');
     const registerMessage = document.getElementById('registerMessage');
     
+    // API Auth Token (disimpan di environment variable)
+    const API_AUTH_TOKEN = 'vercel-auth-token-12345'; // Ini akan diganti dengan env variable
+    
     // Fungsi untuk mengubah tab
     function switchTab(tab) {
         if (tab === 'login') {
@@ -275,10 +278,19 @@
     // Fungsi untuk mendapatkan data pengguna dari API route
     async function getUserData() {
         try {
-            const response = await fetch('/api/get-users');
+            const response = await fetch('/api/get-users', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify({ 
+                    authToken: API_AUTH_TOKEN 
+                })
+            });
             
             if (!response.ok) {
-                throw new Error('Gagal mengambil data');
+                const errorData = await response.json();
+                throw new Error(errorData.error || 'Gagal mengambil data');
             }
             
             const data = await response.json();
@@ -290,6 +302,33 @@
         }
     }
     
+    // Fungsi untuk validasi login
+    async function validateLogin(username, password) {
+        try {
+            const response = await fetch('/api/check-login', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify({ 
+                    username, 
+                    password 
+                })
+            });
+            
+            if (!response.ok) {
+                const errorData = await response.json();
+                throw new Error(errorData.error || 'Login gagal');
+            }
+            
+            const data = await response.json();
+            return data;
+        } catch (error) {
+            console.error('Login error:', error);
+            throw error;
+        }
+    }
+    
     // Fungsi untuk menyimpan data pengguna melalui API route
     async function saveUserData(users) {
         try {
@@ -298,11 +337,15 @@
                 headers: {
                     'Content-Type': 'application/json'
                 },
-                body: JSON.stringify({ users })
+                body: JSON.stringify({ 
+                    users,
+                    authToken: API_AUTH_TOKEN 
+                })
             });
             
             if (!response.ok) {
-                throw new Error('Gagal menyimpan data');
+                const errorData = await response.json();
+                throw new Error(errorData.error || 'Gagal menyimpan data');
             }
             
             return true;
@@ -338,30 +381,17 @@
         submitBtn.disabled = true;
         
         try {
-            // Ambil data pengguna
-            const users = await getUserData();
-            
-            // Cari pengguna dengan username yang sesuai
-            const user = users.find(u => u.username === username);
-            
-            if (!user) {
-                showMessage(loginMessage, 'Username tidak ditemukan', 'error');
-                return;
-            }
-            
-            // Verifikasi password
-            if (user.password !== hashPassword(password)) {
-                showMessage(loginMessage, 'Password salah', 'error');
-                return;
-            }
+            // Validasi login melalui API
+            const result = await validateLogin(username, password);
             
             // Login berhasil
             showMessage(loginMessage, 'Login berhasil! Mengarahkan...', 'success');
             
-            // Simpan session (dalam production, gunakan method yang lebih aman)
+            // Simpan session
             sessionStorage.setItem('user', JSON.stringify({
-                username: user.username,
-                email: user.email,
+                username: result.user.username,
+                email: result.user.email,
+                sessionToken: result.sessionToken,
                 loggedIn: true,
                 timestamp: Date.now()
             }));
@@ -372,7 +402,7 @@
             }, 2000);
         } catch (error) {
             console.error('Login error:', error);
-            showMessage(loginMessage, 'Terjadi kesalahan saat login', 'error');
+            showMessage(loginMessage, error.message, 'error');
         } finally {
             // Kembalikan state tombol
             submitBtn.textContent = originalText;
@@ -466,6 +496,7 @@
     // Proteksi terhadap akses developer tools
     document.addEventListener('contextmenu', (e) => {
         e.preventDefault();
+        return false;
     });
     
     document.addEventListener('keydown', (e) => {
@@ -474,11 +505,23 @@
             e.key === 'F12' ||
             (e.ctrlKey && e.shiftKey && e.key === 'I') ||
             (e.ctrlKey && e.shiftKey && e.key === 'C') ||
-            (e.ctrlKey && e.key === 'U')
+            (e.ctrlKey && e.key === 'U') ||
+            (e.ctrlKey && e.key === 'S') ||
+            (e.ctrlKey && e.key === 'R')
         ) {
             e.preventDefault();
+            return false;
         }
     });
+    
+    // Blokir pembukaan developer tools
+    setInterval(() => {
+        if (window.outerHeight - window.innerHeight > 100 || 
+            window.outerWidth - window.innerWidth > 100) {
+            // Developer tools mungkin terbuka
+            window.location.reload();
+        }
+    }, 1000);
 </script>
 </body>
 </html>
