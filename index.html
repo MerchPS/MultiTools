@@ -1,329 +1,237 @@
 <!DOCTYPE html>
-<html lang="id" class="scroll-smooth">
+<html lang="id">
 <head>
-    <meta charset="UTF-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Secure Login System</title>
-    <!-- Tailwind CSS CDN -->
+    <!-- Tailwind CSS -->
     <script src="https://cdn.tailwindcss.com"></script>
-    <style>
-        /* Custom fade-in animation */
-        @keyframes fadeInUp {
-            0% {
-                opacity: 0;
-                transform: translateY(20px);
-            }
-            100% {
-                opacity: 1;
-                transform: translateY(0);
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    colors: {
+                        primary: {
+                            50: '#f0f9ff',
+                            100: '#e0f2fe',
+                            200: '#bae6fd',
+                            300: '#7dd3fc',
+                            400: '#38bdf8',
+                            500: '#0ea5e9',
+                            600: '#0284c7',
+                            700: '#0369a1',
+                            800: '#075985',
+                            900: '#0c4a6e',
+                        },
+                        secondary: {
+                            50: '#faf6f0',
+                            100: '#f5ebdc',
+                            200: '#edd8bb',
+                            300: '#e2bd93',
+                            400: '#d69e69',
+                            500: '#c17f47',
+                            600: '#a3663a',
+                            700: '#835032',
+                            800: '#6a412b',
+                            900: '#563627',
+                        }
+                    },
+                    animation: {
+                        'fade-in': 'fadeIn 0.5s ease-out',
+                        'slide-up': 'slideUp 0.6s ease-out',
+                        'float': 'float 3s ease-in-out infinite',
+                    },
+                    keyframes: {
+                        fadeIn: {
+                            '0%': { opacity: '0', transform: 'translateY(10px)' },
+                            '100%': { opacity: '1', transform: 'translateY(0)' },
+                        },
+                        slideUp: {
+                            '0%': { opacity: '0', transform: 'translateY(20px)' },
+                            '100%': { opacity: '1', transform: 'translateY(0)' },
+                        },
+                        float: {
+                            '0%, 100%': { transform: 'translateY(0)' },
+                            '50%': { transform: 'translateY(-5px)' },
+                        }
+                    }
+                }
             }
         }
-
-        .fade-in-up {
-            animation: fadeInUp 0.8s ease forwards;
+    </script>
+    <style type="text/css">
+        @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap');
+        
+        * {
+            font-family: 'Inter', 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
         }
-
-        /* Text gradient effect for dark theme */
+        
+        .glass-effect {
+            background: rgba(255, 255, 255, 0.85);
+            backdrop-filter: blur(10px);
+            -webkit-backdrop-filter: blur(10px);
+            border: 1px solid rgba(255, 255, 255, 0.18);
+        }
+        
         .text-gradient {
-            background: linear-gradient(90deg, #a0aec0, #718096);
+            background: linear-gradient(135deg, #0ea5e9 0%, #0369a1 100%);
             -webkit-background-clip: text;
             -webkit-text-fill-color: transparent;
+            background-clip: text;
         }
-
-        /* Smooth tab underline transition */
-        .tab-underline {
+        
+        .btn-gradient {
+            background: linear-gradient(135deg, #0ea5e9 0%, #0369a1 100%);
             transition: all 0.3s ease;
         }
-
-        /* Disable text selection on tabs */
-        .no-select {
-            user-select: none;
+        
+        .btn-gradient:hover {
+            background: linear-gradient(135deg, #0369a1 0%, #0c4a6e 100%);
+            transform: translateY(-2px);
+            box-shadow: 0 10px 25px -5px rgba(14, 165, 233, 0.4);
         }
-
-        /* Background container for particles */
-        #particles-js {
-            position: fixed;
-            top: 0;
+        
+        .input-focus:focus {
+            border-color: #0ea5e9;
+            box-shadow: 0 0 0 3px rgba(14, 165, 233, 0.1);
+        }
+        
+        .tab-active-indicator {
+            position: absolute;
+            bottom: 0;
             left: 0;
-            width: 100vw;
-            height: 100vh;
-            z-index: -1;
-            background: #121212;
+            height: 3px;
+            background: linear-gradient(135deg, #0ea5e9 0%, #0369a1 100%);
+            transition: all 0.3s ease;
+            border-radius: 3px 3px 0 0;
+        }
+        
+        .floating-element {
+            animation: float 6s ease-in-out infinite;
+        }
+        
+        .floating-element:nth-child(2) {
+            animation-delay: 1s;
+        }
+        
+        .floating-element:nth-child(3) {
+            animation-delay: 2s;
+        }
+        
+        /* Custom scrollbar */
+        ::-webkit-scrollbar {
+            width: 6px;
+        }
+        
+        ::-webkit-scrollbar-track {
+            background: rgba(14, 165, 233, 0.1);
+            border-radius: 10px;
+        }
+        
+        ::-webkit-scrollbar-thumb {
+            background: linear-gradient(135deg, #0ea5e9 0%, #0369a1 100%);
+            border-radius: 10px;
+        }
+        
+        /* Selection color */
+        ::selection {
+            background: rgba(14, 165, 233, 0.3);
+        }
+        
+        /* Loading animation */
+        @keyframes pulse {
+            0%, 100% { opacity: 1; }
+            50% { opacity: 0.5; }
+        }
+        
+        .loading {
+            animation: pulse 2s cubic-bezier(0.4, 0, 0.6, 1) infinite;
         }
     </style>
 </head>
-<body class="bg-gray-900 min-h-screen flex items-center justify-center p-6 relative text-gray-300">
-    <!-- Particles background -->
-    <div id="particles-js"></div>
-
-    <div class="container max-w-md w-full bg-gray-800 rounded-3xl shadow-xl overflow-hidden fade-in-up backdrop-blur-md bg-opacity-60 border border-gray-700">
-        <div class="header bg-gradient-to-r from-gray-700 via-gray-800 to-gray-900 p-8 text-center rounded-t-3xl select-none">
-            <h1 class="text-4xl font-extrabold text-gradient mb-2">Secure Login</h1>
-            <p class="text-gray-400 font-medium tracking-wide">Masuk atau daftar untuk mengakses sistem</p>
+<body class="min-h-screen bg-gradient-to-br from-primary-50 to-primary-100 flex items-center justify-center p-4 md:p-6">
+    <!-- Background decorative elements -->
+    <div class="fixed inset-0 overflow-hidden pointer-events-none z-0">
+        <div class="absolute -top-20 -left-20 w-72 h-72 bg-primary-200 rounded-full filter blur-3xl opacity-30 floating-element"></div>
+        <div class="absolute -bottom-20 -right-20 w-96 h-96 bg-primary-300 rounded-full filter blur-3xl opacity-20 floating-element"></div>
+        <div class="absolute top-1/2 left-1/4 w-64 h-64 bg-secondary-200 rounded-full filter blur-3xl opacity-20 floating-element"></div>
+    </div>
+    
+    <div class="container glass-effect rounded-2xl shadow-2xl w-full max-w-md overflow-hidden animate-fade-in z-10">
+        <div class="header bg-gradient-to-r from-primary-600 to-primary-700 text-white p-6 md:p-8 text-center">
+            <h1 class="text-2xl md:text-3xl font-bold mb-2 animate-slide-up">Secure Access</h1>
+            <p class="opacity-90 font-light animate-slide-up" style="animation-delay: 0.1s">Masuk atau daftar untuk mengakses sistem</p>
         </div>
-
-        <div class="form-container p-8">
-            <div class="tab-container flex border-b border-gray-700 mb-8 select-none">
-                <div id="loginTab" class="tab-underline no-select flex-1 text-center py-3 cursor-pointer font-semibold text-gray-400 border-b-4 border-transparent hover:text-gray-200 hover:border-gray-400 active:text-gray-200 active:border-gray-400">
+        
+        <div class="form-container p-6 md:p-8">
+            <div class="tab-container flex relative mb-6 md:mb-8 border-b border-primary-100">
+                <div class="tab relative flex-1 text-center py-3 md:py-4 cursor-pointer font-medium text-primary-400 transition-all duration-300 z-10" id="loginTab">
                     Login
                 </div>
-                <div id="registerTab" class="tab-underline no-select flex-1 text-center py-3 cursor-pointer font-semibold text-gray-400 border-b-4 border-transparent hover:text-gray-200 hover:border-gray-400">
+                <div class="tab relative flex-1 text-center py-3 md:py-4 cursor-pointer font-medium text-primary-400 transition-all duration-300 z-10" id="registerTab">
                     Register
                 </div>
+                <div class="tab-active-indicator w-1/2" id="tabIndicator"></div>
             </div>
-
-            <form id="loginForm" class="form active space-y-6">
-                <div class="input-group">
-                    <label for="loginUsername" class="block mb-2 text-gray-300 font-semibold">Username</label>
-                    <input type="text" id="loginUsername" required
-                        class="w-full px-4 py-3 bg-gray-700 border border-gray-600 rounded-lg focus:outline-none focus:ring-2 focus:ring-gray-500 focus:border-gray-500 transition text-gray-200 placeholder-gray-400" placeholder="Masukkan username" />
+            
+            <form id="loginForm" class="form animate-slide-up" style="display: block;">
+                <div class="input-group mb-5">
+                    <label for="loginUsername" class="block text-sm font-medium text-primary-700 mb-2">Username</label>
+                    <input type="text" id="loginUsername" required 
+                        class="w-full px-4 py-3 rounded-lg border border-primary-200 focus:outline-none input-focus transition-all duration-300 bg-white text-primary-800 placeholder-primary-300">
                 </div>
-
-                <div class="input-group">
-                    <label for="loginPassword" class="block mb-2 text-gray-300 font-semibold">Password</label>
-                    <input type="password" id="loginPassword" required
-                        class="w-full px-4 py-3 bg-gray-700 border border-gray-600 rounded-lg focus:outline-none focus:ring-2 focus:ring-gray-500 focus:border-gray-500 transition text-gray-200 placeholder-gray-400" placeholder="Masukkan password" />
+                
+                <div class="input-group mb-6">
+                    <label for="loginPassword" class="block text-sm font-medium text-primary-700 mb-2">Password</label>
+                    <input type="password" id="loginPassword" required 
+                        class="w-full px-4 py-3 rounded-lg border border-primary-200 focus:outline-none input-focus transition-all duration-300 bg-white text-primary-800 placeholder-primary-300">
                 </div>
-
-                <button type="submit"
-                    class="w-full py-3 bg-gray-600 hover:bg-gray-500 text-gray-100 font-semibold rounded-lg transition duration-300 shadow-md focus:outline-none focus:ring-4 focus:ring-gray-500">
+                
+                <button type="submit" class="btn w-full py-3 px-4 text-white font-semibold rounded-lg transition-all duration-300 transform hover:scale-[1.02] btn-gradient shadow-md">
                     Masuk
                 </button>
-
-                <div id="loginMessage" class="message mt-4 text-center text-sm font-medium"></div>
+                
+                <div id="loginMessage" class="message mt-5 p-3 rounded-lg text-center hidden"></div>
             </form>
-
-            <form id="registerForm" class="form space-y-6 hidden">
-                <div class="input-group">
-                    <label for="registerUsername" class="block mb-2 text-gray-300 font-semibold">Username</label>
-                    <input type="text" id="registerUsername" required
-                        class="w-full px-4 py-3 bg-gray-700 border border-gray-600 rounded-lg focus:outline-none focus:ring-2 focus:ring-gray-500 focus:border-gray-500 transition text-gray-200 placeholder-gray-400" placeholder="Masukkan username" />
+            
+            <form id="registerForm" class="form animate-slide-up hidden">
+                <div class="input-group mb-4">
+                    <label for="registerUsername" class="block text-sm font-medium text-primary-700 mb-2">Username</label>
+                    <input type="text" id="registerUsername" required 
+                        class="w-full px-4 py-3 rounded-lg border border-primary-200 focus:outline-none input-focus transition-all duration-300 bg-white text-primary-800 placeholder-primary-300">
                 </div>
-
-                <div class="input-group">
-                    <label for="registerEmail" class="block mb-2 text-gray-300 font-semibold">Email</label>
-                    <input type="email" id="registerEmail" required
-                        class="w-full px-4 py-3 bg-gray-700 border border-gray-600 rounded-lg focus:outline-none focus:ring-2 focus:ring-gray-500 focus:border-gray-500 transition text-gray-200 placeholder-gray-400" placeholder="Masukkan email" />
+                
+                <div class="input-group mb-4">
+                    <label for="registerEmail" class="block text-sm font-medium text-primary-700 mb-2">Email</label>
+                    <input type="email" id="registerEmail" required 
+                        class="w-full px-4 py-3 rounded-lg border border-primary-200 focus:outline-none input-focus transition-all duration-300 bg-white text-primary-800 placeholder-primary-300">
                 </div>
-
-                <div class="input-group">
-                    <label for="registerPassword" class="block mb-2 text-gray-300 font-semibold">Password</label>
-                    <input type="password" id="registerPassword" required
-                        class="w-full px-4 py-3 bg-gray-700 border border-gray-600 rounded-lg focus:outline-none focus:ring-2 focus:ring-gray-500 focus:border-gray-500 transition text-gray-200 placeholder-gray-400" placeholder="Masukkan password" />
+                
+                <div class="input-group mb-4">
+                    <label for="registerPassword" class="block text-sm font-medium text-primary-700 mb-2">Password</label>
+                    <input type="password" id="registerPassword" required 
+                        class="w-full px-4 py-3 rounded-lg border border-primary-200 focus:outline-none input-focus transition-all duration-300 bg-white text-primary-800 placeholder-primary-300">
                 </div>
-
-                <div class="input-group">
-                    <label for="registerConfirmPassword" class="block mb-2 text-gray-300 font-semibold">Konfirmasi Password</label>
-                    <input type="password" id="registerConfirmPassword" required
-                        class="w-full px-4 py-3 bg-gray-700 border border-gray-600 rounded-lg focus:outline-none focus:ring-2 focus:ring-gray-500 focus:border-gray-500 transition text-gray-200 placeholder-gray-400" placeholder="Konfirmasi password" />
+                
+                <div class="input-group mb-6">
+                    <label for="registerConfirmPassword" class="block text-sm font-medium text-primary-700 mb-2">Konfirmasi Password</label>
+                    <input type="password" id="registerConfirmPassword" required 
+                        class="w-full px-4 py-3 rounded-lg border border-primary-200 focus:outline-none input-focus transition-all duration-300 bg-white text-primary-800 placeholder-primary-300">
                 </div>
-
-                <button type="submit"
-                    class="w-full py-3 bg-gray-600 hover:bg-gray-500 text-gray-100 font-semibold rounded-lg transition duration-300 shadow-md focus:outline-none focus:ring-4 focus:ring-gray-500">
+                
+                <button type="submit" class="btn w-full py-3 px-4 text-white font-semibold rounded-lg transition-all duration-300 transform hover:scale-[1.02] btn-gradient shadow-md">
                     Daftar
                 </button>
-
-                <div id="registerMessage" class="message mt-4 text-center text-sm font-medium"></div>
+                
+                <div id="registerMessage" class="message mt-5 p-3 rounded-lg text-center hidden"></div>
             </form>
         </div>
-
-        <div class="footer border-t border-gray-700 text-center py-6 text-gray-500 text-sm select-none">
-            <p>&copy; 2023 Secure System. All rights reserved.</p>
+        
+        <div class="footer text-center p-5 md:p-6 border-t border-primary-100">
+            <p class="text-primary-500 text-sm">&copy; 2023 Secure System. All rights reserved.</p>
         </div>
     </div>
 
-    <script>
-        // Elemen DOM
-        const loginTab = document.getElementById('loginTab');
-        const registerTab = document.getElementById('registerTab');
-        const loginForm = document.getElementById('loginForm');
-        const registerForm = document.getElementById('registerForm');
-        const loginMessage = document.getElementById('loginMessage');
-        const registerMessage = document.getElementById('registerMessage');
-
-        // Fungsi untuk mengubah tab
-        function switchTab(tab) {
-            if (tab === 'login') {
-                loginTab.classList.add('active');
-                registerTab.classList.remove('active');
-                loginForm.classList.add('active');
-                loginForm.classList.remove('hidden');
-                registerForm.classList.remove('active');
-                registerForm.classList.add('hidden');
-
-                loginTab.classList.add('text-gray-200', 'border-gray-400');
-                loginTab.classList.remove('text-gray-400', 'border-transparent');
-                registerTab.classList.add('text-gray-400', 'border-transparent');
-                registerTab.classList.remove('text-gray-200', 'border-gray-400');
-            } else {
-                registerTab.classList.add('active');
-                loginTab.classList.remove('active');
-                registerForm.classList.add('active');
-                registerForm.classList.remove('hidden');
-                loginForm.classList.remove('active');
-                loginForm.classList.add('hidden');
-
-                registerTab.classList.add('text-gray-200', 'border-gray-400');
-                registerTab.classList.remove('text-gray-400', 'border-transparent');
-                loginTab.classList.add('text-gray-400', 'border-transparent');
-                loginTab.classList.remove('text-gray-200', 'border-gray-400');
-            }
-        }
-
-        // Event listeners untuk tab
-        loginTab.addEventListener('click', () => switchTab('login'));
-        registerTab.addEventListener('click', () => switchTab('register'));
-
-        // Fungsi untuk menampilkan pesan
-        function showMessage(element, text, type) {
-            element.textContent = text;
-            element.className = 'message mt-4 text-center text-sm font-medium';
-
-            if (type === 'success') {
-                element.classList.add('text-green-400', 'bg-green-900', 'border', 'border-green-600', 'rounded', 'p-3');
-            } else if (type === 'error') {
-                element.classList.add('text-red-400', 'bg-red-900', 'border', 'border-red-600', 'rounded', 'p-3');
-            }
-
-            element.style.display = 'block';
-
-            // Sembunyikan pesan setelah 5 detik
-            setTimeout(() => {
-                element.style.display = 'none';
-            }, 5000);
-        }
-    </script>
-
-    <script>
-        // Proteksi terhadap akses developer tools
-        document.addEventListener('contextmenu', (e) => {
-            e.preventDefault();
-            return false;
-        });
-
-        document.addEventListener('keydown', (e) => {
-            // Disable F12, Ctrl+Shift+I, Ctrl+Shift+C, Ctrl+U, Ctrl+S, Ctrl+R
-            if (
-                e.key === 'F12' ||
-                (e.ctrlKey && e.shiftKey && e.key === 'I') ||
-                (e.ctrlKey && e.shiftKey && e.key === 'C') ||
-                (e.ctrlKey && e.key === 'U') ||
-                (e.ctrlKey && e.key === 'S') ||
-                (e.ctrlKey && e.key === 'R')
-            ) {
-                e.preventDefault();
-                return false;
-            }
-        });
-    </script>
-
-    <!-- Particles.js CDN -->
-    <script src="https://cdn.jsdelivr.net/npm/particles.js@2.0.0/particles.min.js"></script>
-    <script>
-        /* ParticlesJS config */
-        particlesJS('particles-js', {
-            particles: {
-                number: {
-                    value: 50,
-                    density: {
-                        enable: true,
-                        value_area: 800
-                    }
-                },
-                color: {
-                    value: '#888888'
-                },
-                shape: {
-                    type: 'circle',
-                    stroke: {
-                        width: 0,
-                        color: '#000000'
-                    }
-                },
-                opacity: {
-                    value: 0.3,
-                    random: true,
-                    anim: {
-                        enable: true,
-                        speed: 1,
-                        opacity_min: 0.1,
-                        sync: false
-                    }
-                },
-                size: {
-                    value: 3,
-                    random: true,
-                    anim: {
-                        enable: false,
-                        speed: 40,
-                        size_min: 0.1,
-                        sync: false
-                    }
-                },
-                line_linked: {
-                    enable: true,
-                    distance: 150,
-                    color: '#555555',
-                    opacity: 0.2,
-                    width: 1
-                },
-                move: {
-                    enable: true,
-                    speed: 1.5,
-                    direction: 'none',
-                    random: true,
-                    straight: false,
-                    out_mode: 'out',
-                    bounce: false,
-                    attract: {
-                        enable: false,
-                        rotateX: 600,
-                        rotateY: 1200
-                    }
-                }
-            },
-            interactivity: {
-                detect_on: 'canvas',
-                events: {
-                    onhover: {
-                        enable: true,
-                        mode: 'grab'
-                    },
-                    onclick: {
-                        enable: true,
-                        mode: 'push'
-                    },
-                    resize: true
-                },
-                modes: {
-                    grab: {
-                        distance: 140,
-                        line_linked: {
-                            opacity: 0.3
-                        }
-                    },
-                    bubble: {
-                        distance: 400,
-                        size: 40,
-                        duration: 2,
-                        opacity: 0.8,
-                        speed: 3
-                    },
-                    repulse: {
-                        distance: 100,
-                        duration: 0.4
-                    },
-                    push: {
-                        particles_nb: 4
-                    },
-                    remove: {
-                        particles_nb: 2
-                    }
-                }
-            },
-            retina_detect: true
-        });
-    </script>
     <script>
     // Elemen DOM
     const loginTab = document.getElementById('loginTab');
@@ -332,6 +240,7 @@
     const registerForm = document.getElementById('registerForm');
     const loginMessage = document.getElementById('loginMessage');
     const registerMessage = document.getElementById('registerMessage');
+    const tabIndicator = document.getElementById('tabIndicator');
     
     // API Auth Token
     const API_AUTH_TOKEN = 'secure-auth-token-987654321-vercel-app';
@@ -339,15 +248,33 @@
     // Fungsi untuk mengubah tab
     function switchTab(tab) {
         if (tab === 'login') {
-            loginTab.classList.add('active');
-            registerTab.classList.remove('active');
-            loginForm.classList.add('active');
-            registerForm.classList.remove('active');
+            loginTab.classList.add('text-primary-700', 'font-semibold');
+            loginTab.classList.remove('text-primary-400');
+            registerTab.classList.add('text-primary-400');
+            registerTab.classList.remove('text-primary-700', 'font-semibold');
+            tabIndicator.style.transform = 'translateX(0)';
+            
+            loginForm.classList.remove('hidden');
+            setTimeout(() => {
+                loginForm.classList.add('animate-slide-up');
+            }, 10);
+            
+            registerForm.classList.add('hidden');
+            registerForm.classList.remove('animate-slide-up');
         } else {
-            registerTab.classList.add('active');
-            loginTab.classList.remove('active');
-            registerForm.classList.add('active');
-            loginForm.classList.remove('active');
+            registerTab.classList.add('text-primary-700', 'font-semibold');
+            registerTab.classList.remove('text-primary-400');
+            loginTab.classList.add('text-primary-400');
+            loginTab.classList.remove('text-primary-700', 'font-semibold');
+            tabIndicator.style.transform = 'translateX(100%)';
+            
+            registerForm.classList.remove('hidden');
+            setTimeout(() => {
+                registerForm.classList.add('animate-slide-up');
+            }, 10);
+            
+            loginForm.classList.add('hidden');
+            loginForm.classList.remove('animate-slide-up');
         }
     }
     
@@ -358,12 +285,12 @@
     // Fungsi untuk menampilkan pesan
     function showMessage(element, text, type) {
         element.textContent = text;
-        element.className = `message ${type}`;
-        element.style.display = 'block';
+        element.className = `message mt-5 p-3 rounded-lg text-center ${type === 'success' ? 'bg-green-100 text-green-700 border border-green-200' : 'bg-red-100 text-red-700 border border-red-200'}`;
+        element.classList.remove('hidden');
         
         // Sembunyikan pesan setelah 5 detik
         setTimeout(() => {
-            element.style.display = 'none';
+            element.classList.add('hidden');
         }, 5000);
     }
     
@@ -452,6 +379,7 @@
         const originalText = submitBtn.textContent;
         submitBtn.textContent = 'Memproses...';
         submitBtn.disabled = true;
+        submitBtn.classList.add('loading');
         
         try {
             // Validasi login melalui API
@@ -480,6 +408,7 @@
             // Kembalikan state tombol
             submitBtn.textContent = originalText;
             submitBtn.disabled = false;
+            submitBtn.classList.remove('loading');
         }
     });
     
@@ -517,6 +446,7 @@
         const originalText = submitBtn.textContent;
         submitBtn.textContent = 'Memproses...';
         submitBtn.disabled = true;
+        submitBtn.classList.add('loading');
         
         try {
             // Registrasi user baru melalui API khusus
@@ -525,7 +455,7 @@
                 email,
                 password,
                 confirmPassword,
-                captchaToken: 'demo-token' // Ganti dengan token CAPTCHA nyata jika digunakan
+                captchaToken: 'demo-token'
             });
             
             if (result.success) {
@@ -546,6 +476,7 @@
             // Kembalikan state tombol
             submitBtn.textContent = originalText;
             submitBtn.disabled = false;
+            submitBtn.classList.remove('loading');
         }
     });
     
@@ -569,6 +500,11 @@
             return false;
         }
     });
-</script>
+    
+    // Inisialisasi tab indicator
+    setTimeout(() => {
+        tabIndicator.style.transition = 'transform 0.3s ease';
+    }, 100);
+    </script>
 </body>
 </html>
